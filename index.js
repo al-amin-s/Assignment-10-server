@@ -1,5 +1,5 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const cors = require('cors');
 const app = express();
@@ -26,9 +26,7 @@ async function run() {
         await client.connect();
 
         const artCollection = client.db("artDB").collection("art");
-
-
-
+        const categoryCollection=client.db("artDB").collection("category");
         app.post('/art', async (req, res) => {
             const newArt = req.body;
             console.log(newArt);
@@ -41,28 +39,40 @@ async function run() {
             const result = await cursor.toArray();
             res.send(result);
         })
-        // app.get('/art/:id', async (req, res) => {
-        //     const id=req.params.id;
-        //      const query={_id:new ObjectId(id)};
-        //     const result = await artCollection.findOne(query);
-        //     res.send(result);
-        // })
+        
+        
+        app.get('/art/:id', async (req, res) => {
+            const id=req.params.id;
+             const query={_id:new ObjectId(id)};
+            const result = await artCollection.findOne(query);
+            res.send(result);
+        })
 
         app.get("/art/:email", async(req,res)=>{
             console.log(req.params.email);
             const result=await artCollection.find({ email: req.params.email }). toArray();
             res.send(result)
         })
-        
-       
-        // operation for sending data to localhost
 
-        // Send a ping to confirm a successful connection
+        app.post('/category', async (req, res) => {
+            const newCategory = req.body;
+            console.log(newCategory);
+            const result = await categoryCollection.insertOne(newCategory);
+            res.send(result)
+        })
+
+        app.get('/category', async (req, res) => {
+            const cursor = categoryCollection.find();
+            const result = await cursor.toArray();
+            res.send(result);
+        })
+
+        
+        
         await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
-        // Ensures that the client will close when you finish/error
-        // await client.close();
+        
     }
 }
 run().catch(console.dir);
