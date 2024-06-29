@@ -48,11 +48,25 @@ async function run() {
             res.send(result);
         })
 
-        app.get("/art/:email", async(req,res)=>{
+        app.get('/art/:email', async(req,res)=>{
             console.log(req.params.email);
             const result=await artCollection.find({ email: req.params.email }). toArray();
             res.send(result)
         })
+
+        app.get('/art/:email', async (req, res) => {
+            const { email } = req.params;
+            console.log(email);
+        
+            try {
+                const result = await artCollection.find({ email }).toArray();
+                res.send(result);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                res.status(500).send('Internal Server Error');
+            }
+        });
+        
 
         app.post('/category', async (req, res) => {
             const newCategory = req.body;
@@ -86,8 +100,7 @@ run().catch(console.dir);
 const hello = [
     {
         name: "alamin",
-        email: "ala756297@gmail.com",
-        mobile: "nai"
+        email: "ala756297@gmail.com"
     }
 ]
 
